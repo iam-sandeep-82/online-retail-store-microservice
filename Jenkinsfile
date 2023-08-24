@@ -10,6 +10,10 @@ pipeline {
         var2 = 12345
         var3 = true
         DOCKERPASS = "$dockerhub_access"
+
+        JENKINS_HOME = "${JENKINS_HOME}"
+        JOB_NAME = "${JOB_NAME}"
+        BUILD_NUMBER = "${BUILD_NUMBER}"
     }
     stages {
 
@@ -102,13 +106,11 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                // Copy the archived artifact to the Docker context (folder where Dockerfile is located)
-                sh "sudo mkdir -p /artifact/"
-                sh 'cp -r ${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/archive/*/target/*.jar /artifact/'
-                sh 'ls -lh /artifact'
-
                 // Build the Docker image
-                // sh 'docker build -t :beta${BUILD_NUMBER} .'
+               sh ''' docker build --build-arg JENKINS_HOME=${env.JENKINS_HOME} \
+                     --build-arg JOB_NAME=${env.JOB_NAME} \
+                     --build-arg BUILD_NUMBER=${env.BUILD_NUMBER} \
+                     -t shopping-client:${env.BUILD_NUMBER} -f ./shopping-client/test-dockerfile .'''
             }
         }
 
