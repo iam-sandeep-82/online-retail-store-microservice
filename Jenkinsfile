@@ -1,0 +1,131 @@
+pipeline {
+    // agent { docker {image "iamsandeep82/django-app:latest"}}
+    agent any
+
+    environment {
+        dockerHome = tool 'jdk17'  // tool will provide a installed path
+        mavenHome = tool 'maven3.9'
+        PATH = "$dockerHome/bin:$mavenHome/bin:$PATH" //from $ accessing variable
+        var1 = "abcdefgl"
+        var2 = 12345
+        var3 = true
+        DOCKERPASS = "$dockerhub_access"
+    }
+    stages {
+
+        // START OF CI PIPELINE
+
+        stage('Clean Workspace') {
+                steps {
+                    cleanWs()
+                }
+            }
+
+         stage('Fetch Code') {
+                steps {
+                    git branch: 'main', url: 'https://github.com/iam-sandeep-82/online-retail-store-microservice'
+                    sh "ls -lh"
+                }
+            }    
+
+        stage('Setting ENV Vars') {
+            steps {
+                // ENVIRONMENT VARS --> USE TO DEFINE AND ACCESS INSIDE RUNNING AGENT
+                // VARs  --> USE TO DEFINE THE VARS ACROSSS THE SCRIPTS
+                echo "MY VARs"
+                echo "VAR1 - $var1"
+                echo "VAR3 - $var2"
+                echo "VAR3 - $var3"
+                
+                echo "PREDEFINED ENV VARs"
+                echo "TAG_NAME $env.TAG_NAME"
+                echo "BRANCH_NAME $env.BRANCH_NAME"
+                echo "BRANCH_IS_PRIMARY $env.BRANCH_IS_PRIMARY"
+                echo "JOB_NAME $env.JOB_NAME"
+                echo "WORKSPACE $env.WORKSPACE"
+                echo "TAG_DATE $env.BUILD_TAG"
+                echo "JENKINS_URL $env.JENKINS_URL"
+                
+            }
+        }
+
+       
+        stage('Build JAR package') {
+                steps {
+                echo "---- BUILDING JAR FILE -----" 
+                      sh "chmod +x ./build_jar.sh"
+                      sh "./build_jar.sh ./api-gateway/" 
+                      sh "./build_jar.sh ./cart-client/" 
+                      sh "./build_jar.sh ./customer-client/" 
+                      sh "./build_jar.sh ./eureka-server/" 
+                      sh "./build_jar.sh ./inventory-client/" 
+                      sh "./build_jar.sh ./order-client/" 
+                      sh "./build_jar.sh ./product-client/" 
+                      sh "./build_jar.sh ./shopping-client/" 
+                }
+        }
+
+
+        stage("UNIT TEST") {
+            steps {
+                echo "----PERFORMING JUNIT TEST----"
+            }
+        }
+
+        stage("CHECKSTYLE TEST") {
+            steps {
+                echo "----PERFORMING CHECKSTYLE TEST----"
+            }
+        }
+
+
+        stage("CODE QUALITY TEST") {
+            steps {
+                echo "----PERFORMING CODE QUALITY TEST----"
+            }
+        }
+        
+         stage("ARCHIVING THE ARTIFACT") {
+            steps {
+                // Build your application, e.g., compile code, run tests
+                // Archive artifacts for later use
+                archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
+                // Copy the archived artifact to the Docker context (folder where Dockerfile is located)
+
+            }
+            
+        }
+
+        // END OF CI PIPELINE
+
+        // START OF CONTINOUS DELIVERY PIPELINE
+
+        stage('Docker Build') {
+            steps {
+                // Copy the archived artifact to the Docker context (folder where Dockerfile is located)
+                sh "sudo mkdir -p /artifact/"
+                sh 'cp -r ${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/archive/*/target/*.jar /artifact/'
+                sh 'ls -lh /artifact'
+
+                // Build the Docker image
+                // sh 'docker build -t :beta${BUILD_NUMBER} .'
+            }
+        }
+
+        // stage('Publish Docker Image') {
+        //     steps {
+        //         // Push the Docker image to a Docker registry
+        //         withDockerRegistry([credentialsId: 'your-docker-registry-credentials-id', url: 'https://your-docker-registry-url']) {
+        //             sh 'docker push your-docker-image-name:${BUILD_NUMBER}'
+        //         }
+        //     }
+
+        
+    }
+
+    post{
+        always{ echo "i run every condition"}
+        success{ echo "i run only when any success occured"}
+        failure{ echo "i run only when any error occured"}
+    }
+}
