@@ -1,6 +1,5 @@
 eureka-server         --> 8761 
 api-gateway           --> 8600 --> API-GATEWAY
-
 cart-client           --> 8300 --> CART-SERVICE
 customer-client       --> 8000 --> CUSTOMER-SERVICE
 inventory-client      --> 8200 --> INVENTORY-SERVICE
