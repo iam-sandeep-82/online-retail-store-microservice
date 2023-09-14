@@ -3,8 +3,8 @@ pipeline {
     agent any
 
     environment {
-        dockerHome = tool 'jdk17'  // tool will provide a installed path
-        mavenHome = tool 'maven3.9'
+        // dockerHome = tool 'jdk17'  // tool will provide a installed path
+        // mavenHome = tool 'maven3.9'
         PATH = "$dockerHome/bin:$mavenHome/bin:$PATH" //from $ accessing variable
         var1 = "abcdefgl"
         var2 = 12345
