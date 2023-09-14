@@ -108,12 +108,16 @@ pipeline {
 
         stage('Docker Build METHOD-1') {
             steps {
-                // Build the Docker image
-               sh ''' docker build --build-arg JENKINS_HOME="\${env.JENKINS_HOME}" \
-                     --build-arg JOB_NAME="\${env.JOB_NAME}" \
-                     --build-arg BUILD_NUMBER="\${env.BUILD_NUMBER}" \
-                     -t shopping-client:"\${env.BUILD_NUMBER}" -f ./shopping-client/test-dockerfile .'''
-                 sh "docker images | grep shopping-client"
+                script {
+                    echo "JENKINS_HOME: ${env.JENKINS_HOME}"
+                    echo "JOB_NAME: ${env.JOB_NAME}"
+                    echo "BUILD_NUMBER: ${env.BUILD_NUMBER}"
+                }
+                sh '''docker build --build-arg JENKINS_HOME="\${env.JENKINS_HOME}" \
+                       --build-arg JOB_NAME="\${env.JOB_NAME}" \
+                       --build-arg BUILD_NUMBER="\${env.BUILD_NUMBER}" \
+                       -t shopping-client:"\${env.BUILD_NUMBER}" -f ./shopping-client/test-dockerfile .'''
+                sh "docker images | grep shopping-client"
             }
         }
 
