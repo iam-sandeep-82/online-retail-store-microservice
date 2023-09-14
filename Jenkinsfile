@@ -15,7 +15,8 @@ pipeline {
         JOB_NAME = "${JOB_NAME}"
         BUILD_NUMBER = "${BUILD_NUMBER}"
     }
-    stages {
+
+    stages {    
 
         // START OF CI PIPELINE
 
@@ -89,7 +90,8 @@ pipeline {
             }
         }
         
-         stage("ARCHIVING THE ARTIFACT") {
+
+        stage("ARCHIVING THE ARTIFACT") {
             steps {
                 // Build your application, e.g., compile code, run tests
                 // Archive artifacts for later use
@@ -104,19 +106,18 @@ pipeline {
 
         // START OF CONTINOUS DELIVERY PIPELINE
 
-        stage('Docker Build') {
-            steps {
-                // Build the Docker image
-               sh ''' docker build --build-arg JENKINS_HOME=${env.JENKINS_HOME} \
-                     --build-arg JOB_NAME=${env.JOB_NAME} \
-                     --build-arg BUILD_NUMBER=${env.BUILD_NUMBER} \
-                     -t shopping-client:${env.BUILD_NUMBER} -f ./shopping-client/test-dockerfile .'''
-            }
-        }
+        // stage('Docker Build METHOD-1') {
+        //     steps {
+        //         // Build the Docker image
+        //        sh ''' docker build --build-arg JENKINS_HOME=${env.JENKINS_HOME} \
+        //              --build-arg JOB_NAME=${env.JOB_NAME} \
+        //              --build-arg BUILD_NUMBER=${env.BUILD_NUMBER} \
+        //              -t shopping-client:${env.BUILD_NUMBER} -f ./shopping-client/test-dockerfile .'''
+        //     }
+        // }
 
 
-
-        stage('Docker Build') {
+        stage('Docker Build METHOD-2') {
             steps {
                 // Build the Docker image
                sh '''docker build -t shopping-client:${env.BUILD_NUMBER} -f ./shopping-client/test-dockerfile .'''
