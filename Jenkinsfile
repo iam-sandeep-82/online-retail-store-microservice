@@ -120,6 +120,7 @@ pipeline {
             steps {
                 // Build the Docker image
                sh '''docker build -t shopping-client:${env.BUILD_NUMBER} -f ./shopping-client/test-dockerfile .'''
+               sh 'docker images | grep shopping-client'
             }
         }
 
