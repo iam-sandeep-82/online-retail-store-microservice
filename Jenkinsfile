@@ -114,6 +114,15 @@ pipeline {
             }
         }
 
+
+
+        stage('Docker Build') {
+            steps {
+                // Build the Docker image
+               sh '''docker build -t shopping-client:${env.BUILD_NUMBER} -f ./shopping-client/test-dockerfile .'''
+            }
+        }
+
         // stage('Publish Docker Image') {
         //     steps {
         //         // Push the Docker image to a Docker registry
