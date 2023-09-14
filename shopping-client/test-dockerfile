@@ -1,8 +1,11 @@
+ARG JENKINS_HOME
+ARG JOB_NAME
+ARG BUILD_NUMBER
+
 FROM maven:3.9-eclipse-temurin-17-alpine
 RUN mkdir -p /src
 WORKDIR /src
 
 # Copy the JAR from the Jenkins build directory into the container
-COPY ./shopping-client/target/shopping-client-0.0.1-SNAPSHOT.jar .
-
+COPY ${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/archive/shopping-client/target/shopping-client-0.0.1-SNAPSHOT.jar .
 ENTRYPOINT ["java", "-jar", "shopping-client-0.0.1-SNAPSHOT.jar"]
