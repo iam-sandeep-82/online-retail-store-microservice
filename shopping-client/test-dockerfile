@@ -1,7 +1,3 @@
-ARG JENKINS_HOME
-ARG JOB_NAME
-ARG BUILD_NUMBER
-
 FROM maven:3.9-eclipse-temurin-17-alpine
 RUN mkdir -p /src
 WORKDIR /src
