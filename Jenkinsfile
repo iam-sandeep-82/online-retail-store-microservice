@@ -122,19 +122,24 @@ pipeline {
         // }
 
 
-        stage('Docker Build METHOD-2') {
-            steps {
-                // Build the Docker image
-               sh "docker build -t iamsandeep82/shopping-client:${env.BUILD_NUMBER} -f ./shopping-client/Dockerfile ."
-            }
+        // stage('Docker Build METHOD-2') {
+        //     steps {
+        //         // Build the Docker image
+        //        sh "docker build -t iamsandeep82/shopping-client:${env.BUILD_NUMBER} -f ./shopping-client/Dockerfile ."
+        //     }
+        // }
+
+       stage('Build image') {
+            dockerImage = docker.build("iamsandeep82/shopping-client:${env.BUILD_NUMBER}", "-f ./shopping-client/Dockerfile .")
         }
+
 
 
         stage('Publish Docker Image') {
             steps {
                 // Push the Docker image to a Docker registry
                 withDockerRegistry([credentialsId: 'docker-cred', url: 'https://registry.hub.docker.com']) {
-                    sh "docker push iamsandeep82/shopping-client:${env.BUILD_NUMBER}"
+                    dockerImage.push()
                 }
             }
         }
