@@ -59,13 +59,13 @@ pipeline {
                 steps {
                 echo "---- BUILDING JAR FILE -----" 
                       sh "chmod +x ./build_jar.sh"
-                      sh "./build_jar.sh ./api-gateway/" 
-                      sh "./build_jar.sh ./cart-client/" 
-                      sh "./build_jar.sh ./customer-client/" 
-                      sh "./build_jar.sh ./eureka-server/" 
-                      sh "./build_jar.sh ./inventory-client/" 
-                      sh "./build_jar.sh ./order-client/" 
-                      sh "./build_jar.sh ./product-client/" 
+                      // sh "./build_jar.sh ./api-gateway/" 
+                      // sh "./build_jar.sh ./cart-client/" 
+                      // sh "./build_jar.sh ./customer-client/" 
+                      // sh "./build_jar.sh ./eureka-server/" 
+                      // sh "./build_jar.sh ./inventory-client/" 
+                      // sh "./build_jar.sh ./order-client/" 
+                      // sh "./build_jar.sh ./product-client/" 
                       sh "./build_jar.sh ./shopping-client/" 
                 }
         }
