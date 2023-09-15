@@ -133,7 +133,7 @@ pipeline {
         stage('Publish Docker Image') {
             steps {
                 // Push the Docker image to a Docker registry
-                withDockerRegistry([credentialsId: 'docker-cred', url: 'https://hub.docker.com/']) {
+                withDockerRegistry([credentialsId: 'docker-cred', url: 'https://registry.hub.docker.com']) {
                     sh "docker push iamsandeep82/shopping-client:${env.BUILD_NUMBER}"
                 }
             }
