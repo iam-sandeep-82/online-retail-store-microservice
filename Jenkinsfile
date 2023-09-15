@@ -129,7 +129,7 @@ pipeline {
         //     }
         // }
 
-       stage('Build image') {
+        stage('Build image') {
             dockerImage = docker.build("iamsandeep82/shopping-client:${env.BUILD_NUMBER}", "-f ./shopping-client/Dockerfile .")
         }
 
