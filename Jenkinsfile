@@ -130,6 +130,7 @@ pipeline {
             }
         }
 
+
         stage('Publish Docker Image') {
             steps {
                 // Push the Docker image to a Docker registry
@@ -137,6 +138,7 @@ pipeline {
                     sh "docker push iamsandeep82/shopping-client:${env.BUILD_NUMBER}"
                 }
             }
+        }
 
         
     }
