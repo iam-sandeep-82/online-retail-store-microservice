@@ -2,6 +2,14 @@ pipeline {
     // agent { docker {image "iamsandeep82/django-app:latest"}}
     agent any
 
+
+    tools {
+        maven 'maven'
+        dockerTool 'docker'
+        jdk 'OpenJDK8'
+    }
+
+
     environment {
         // dockerHome = tool 'jdk17'  // tool will provide a installed path
         // mavenHome = tool 'maven3.9'
@@ -29,30 +37,8 @@ pipeline {
          stage('Fetch Code') {
                 steps {
                     git branch: 'main', url: 'https://github.com/iam-sandeep-82/online-retail-store-microservice'
-                    sh "ls -lh"
                 }
             }    
-
-        stage('Setting ENV Vars') {
-            steps {
-                // ENVIRONMENT VARS --> USE TO DEFINE AND ACCESS INSIDE RUNNING AGENT
-                // VARs  --> USE TO DEFINE THE VARS ACROSSS THE SCRIPTS
-                echo "MY VARs"
-                echo "VAR1 - $var1"
-                echo "VAR3 - $var2"
-                echo "VAR3 - $var3"
-                
-                echo "PREDEFINED ENV VARs"
-                echo "TAG_NAME $env.TAG_NAME"
-                echo "BRANCH_NAME $env.BRANCH_NAME"
-                echo "BRANCH_IS_PRIMARY $env.BRANCH_IS_PRIMARY"
-                echo "JOB_NAME $env.JOB_NAME"
-                echo "WORKSPACE $env.WORKSPACE"
-                echo "TAG_DATE $env.BUILD_TAG"
-                echo "JENKINS_URL $env.JENKINS_URL"
-                
-            }
-        }
 
        
         stage('Build JAR package') {
@@ -71,11 +57,14 @@ pipeline {
         }
 
 
+
         stage("UNIT TEST") {
             steps {
                 echo "----PERFORMING JUNIT TEST----"
             }
         }
+        
+        
 
         stage("CHECKSTYLE TEST") {
             steps {
@@ -90,6 +79,14 @@ pipeline {
             }
         }
         
+        
+        stage("OWASP DEPENDANCY CHECK") {
+            steps {
+                echo "----PERFORMING OWASP DEPENDANCY----"
+            }
+        }
+        
+           
 
         stage("ARCHIVING THE ARTIFACT") {
             steps {
@@ -106,40 +103,14 @@ pipeline {
 
         // START OF CONTINOUS DELIVERY PIPELINE
 
-        // stage('Docker Build METHOD-1') {
-        //     steps {
-        //         script {
-        //             echo "JENKINS_HOME: ${env.JENKINS_HOME}"
-        //             echo "JOB_NAME: ${env.JOB_NAME}"
-        //             echo "BUILD_NUMBER: ${env.BUILD_NUMBER}"
-        //         }
-        //         sh '''docker build --build-arg JENKINS_HOME="\${env.JENKINS_HOME}" \
-        //                --build-arg JOB_NAME="\${env.JOB_NAME}" \
-        //                --build-arg BUILD_NUMBER="\${env.BUILD_NUMBER}" \
-        //                -t shopping-client:"\${env.BUILD_NUMBER}" -f ./shopping-client/test-dockerfile .'''
-        //         sh "docker images | grep shopping-client"
-        //     }
-        // }
-
-
-        // stage('Docker Build METHOD-2') {
-        //     steps {
-        //         // Build the Docker image
-        //        sh "docker build -t iamsandeep82/shopping-client:${env.BUILD_NUMBER} -f ./shopping-client/Dockerfile ."
-        //     }
-        // }
-
-        stage('Build image') {
-            dockerImage = docker.build("iamsandeep82/shopping-client:${env.BUILD_NUMBER}", "-f ./shopping-client/Dockerfile .")
-        }
-
-
-
-        stage('Publish Docker Image') {
+        stage('Docker Build & Publish') {
             steps {
-                // Push the Docker image to a Docker registry
-                withDockerRegistry([credentialsId: 'docker-cred', url: 'https://registry.hub.docker.com']) {
-                    dockerImage.push()
+                script{
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh "docker build -t shopping-client:v1 -f ./docker/Dockerfile ."
+                        sh "docker tag shopping-client:v1 iamsandeep82/shopping-client:v1"
+                        sh "docker push iamsandeep82/shopping-client:v1"
+                    }
                 }
             }
         }
