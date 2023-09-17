@@ -1,0 +1,99 @@
+pipeline {
+    // agent { docker {image "iamsandeep82/django-app:latest"}}
+    agent any
+
+
+    tools {
+        maven 'maven'
+        dockerTool 'docker'
+        jdk 'OpenJDK8'
+    }
+
+    stages {    
+
+         stage('Fetch Code') {
+                steps {
+                    git branch: 'main', url: 'https://github.com/iam-sandeep-82/online-retail-store-microservice'
+                }
+            }   
+
+
+         stage('Compile Source Code') {
+                steps {
+                      sh "chmod +x ./doMaven.sh"
+                      sh "./compile.sh ./shopping-client/" 
+                      
+                      // sh "./build_jar.sh ./api-gateway/" 
+                      // sh "./build_jar.sh ./cart-client/" 
+                      // sh "./build_jar.sh ./customer-client/" 
+                      // sh "./build_jar.sh ./eureka-server/" 
+                      // sh "./build_jar.sh ./inventory-client/" 
+                      // sh "./build_jar.sh ./order-client/" 
+                      // sh "./build_jar.sh ./product-client/" 
+                      
+                }
+        }
+
+
+        stage("Unit Test") {
+            steps {
+                echo "----PERFORMING JUNIT TEST----"
+                // sh "./doMaven.sh ./shopping-client/ test" 
+            }
+        }
+        
+        
+
+        stage("Checkstyle Check") {
+            steps {
+                echo "----PERFORMING CHECKSTYLE TEST----"
+            }
+        }
+
+
+        stage("Code Coverage & Code Quality Check") {
+            steps {
+                echo "----PERFORMING CODE QUALITY TEST----"
+            }
+        }
+        
+        
+        stage("OWASP Vulnerability Scan") {
+            steps {
+                echo "----PERFORMING OWASP DEPENDANCY----"
+            }
+        }
+
+        stage("Build Artifact") {
+            steps {
+                echo "----Build Artifact----"
+                  sh "./package.sh ./shopping-client/" 
+            }
+        }
+        
+           
+
+        stage("ARCHIVING THE ARTIFACT") {
+            steps {
+                archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
+            }
+            
+        }
+
+        // START OF CONTINOUS DELIVERY PIPELINE
+
+        stage('Docker Build & Publish') {
+            steps {
+                script{
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh "docker build -t shopping-client:v2 -f ./docker/Dockerfile ."
+                        sh "docker tag shopping-client:v2 iamsandeep82/shopping-client:v2"
+                        sh "docker push iamsandeep82/shopping-client:v2"
+                    }
+                }
+            }
+        }
+
+        
+    }
+}
