@@ -107,7 +107,7 @@ pipeline {
             steps {
                 script{
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                        sh "docker build -t shopping-client:v1 -f ./docker/Dockerfile ."
+                        sh "docker build -t shopping-client:v1 -f ./shopping-client/Dockerfile ."
                         sh "docker tag shopping-client:v1 iamsandeep82/shopping-client:v1"
                         sh "docker push iamsandeep82/shopping-client:v1"
                     }

@@ -20,7 +20,7 @@ pipeline {
 
          stage('Compile Source Code') {
                 steps {
-                      sh "chmod +x ./doMaven.sh"
+                      sh "chmod +x ./compile.sh"
                       sh "./compile.sh ./shopping-client/" 
                       
                       // sh "./build_jar.sh ./api-gateway/" 
@@ -38,7 +38,7 @@ pipeline {
         stage("Unit Test") {
             steps {
                 echo "----PERFORMING JUNIT TEST----"
-                // sh "./doMaven.sh ./shopping-client/ test" 
+                // sh "./test.sh ./shopping-client/" 
             }
         }
         
@@ -67,7 +67,8 @@ pipeline {
         stage("Build Artifact") {
             steps {
                 echo "----Build Artifact----"
-                  sh "./package.sh ./shopping-client/" 
+                sh "chmod +x ./package.sh"
+                sh "./package.sh ./shopping-client/" 
             }
         }
         
@@ -86,9 +87,9 @@ pipeline {
             steps {
                 script{
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                        sh "docker build -t shopping-client:v2 -f ./docker/Dockerfile ."
-                        sh "docker tag shopping-client:v2 iamsandeep82/shopping-client:v2"
-                        sh "docker push iamsandeep82/shopping-client:v2"
+                        sh "docker build -t shopping-client:v3 -f ./shopping-client/Dockerfile ."
+                        sh "docker tag shopping-client:v3 iamsandeep82/shopping-client:v3"
+                        sh "docker push iamsandeep82/shopping-client:v3"
                     }
                 }
             }
